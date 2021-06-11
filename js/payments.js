@@ -15,11 +15,8 @@ let api = new TapyrusApi.PaymentApi();
 function post_payment(opts) {
   return new Promise((resolve, reject) => {
     api.payment(opts, (err, data, response) => {
-      try {
-        resolve(response);
-      } catch(err) {
-        reject(err);
-      }
+      if (err) reject(err);
+      resolve(data);
     })
   })
 }
