@@ -11,8 +11,7 @@ defaultClient.defaultHeaders = { Authorization: `Bearer ${accessToken}` }
 
 let api = new TapyrusApi.PaymentApi();
 
-
-function postPayment(opts) {
+function addPayment(opts) {
   return new Promise((resolve, reject) => {
     api.payment(opts, (err, data, response) => {
       if (err) reject(err);
@@ -23,7 +22,7 @@ function postPayment(opts) {
 
 // @route   POST /api/v1/payment 
 // @desc    Sending tapyrus
-let opts = { address: 'mnzdZUieW2Hqe9GzZzVbcA7nHkDeFhJFzd', amount: 100000 };
-postPayment(opts)
+let paymentRequest = TapyrusApi.PaymentRequest.constructFromObject({ address: 'mnpLDGG9iuyyyRzrdtXPnmugx9Zqr9CZgg', amount: 500, fee: 1000 })
+addPayment({paymentRequest})
   .then(data => console.log(data))
   .catch(err => console.log(err))
