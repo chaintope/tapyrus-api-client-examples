@@ -27,6 +27,15 @@ begin
   result = api_instance.get_tokens(confirmation_only_opts)
   p result
 
+  # @route   POST /api/v1/tokens/:token_id/reissue 
+  # @desc    Reissue Token
+  reissue_token_id = 'c3ec2fd806701a3f55808cbec3922c38dafaa3070c48c803e9043ee3642c660b46'
+  opts = {
+    reissue_token_request: OpenapiClient::ReissueTokenRequest.new({amount: 100}) # ReissueTokenRequest | 
+  }
+  reissue_token_result = api_instance.reissue_token(reissue_token_id, reissue_token_request)
+  p reissue_token_result
+
   # @route   POST /api/v1/tokens/:token_id/transfer 
   # @desc    Get the list of tokens
   transfer_token_id = 'c3ec2fd806701a3f55808cbec3922c38dafaa3070c48c803e9043ee3642c660b46'
