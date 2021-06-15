@@ -61,14 +61,14 @@ issueTokens(issueTokenRequest)
   .then(data => console.log(data))
   .catch(err => console.log(err))
  
-// @route   POST /api/v1/tokens/issue 
+// @route   POST /api/v1/tokens/:token_id/transfer 
 // @desc    Get the list of tokens
 let transferTokenId = "c1f679686676df6a8aceef468906081a6f3749d015567489efd822bcc946198259"
 transferTokens(transferTokenId)
   .then(data => console.log(data))
   .catch(err => console.log(err))
 
-// @route   POST /api/v1/tokens/issue 
+// @route   POST /api/v1/tokens/:token_id/burn 
 // @desc    Get the list of tokens
 let burnTokenId = "c1744ff7a83247eb2537789fb82fd1d26d0dd69fc96ab5952bb526e00804117a75"
 let amount = { amount: 100 }
