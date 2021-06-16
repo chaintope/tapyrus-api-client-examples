@@ -17,8 +17,8 @@ begin
   add_timestamp_opts = {
     add_timestamp_request: OpenapiClient::AddTimestampRequest.new({content_hash: '9ccc644b03a88358a754962903a659a2d338767ee61674dde5434702a6256e6d'}) 
   }
-  api_instance.add_timestamp(add_timestamp_opts)
-  p payment_result
+  add_timestamp_responses = api_instance.add_timestamp_with_http_info(add_timestamp_opts)
+  p add_timestamp_responses[1]
 
   # @route   GET /api/v1/timestamps 
   # @desc    Get the list of timestamps
