@@ -4,6 +4,7 @@
 1. Generate js client code 
 
 2. Build and install npm package as a global package
+
 ```
 $ cd /path/to/generated/js/client
 $ npm install
@@ -13,6 +14,7 @@ $ npm install .
 ```
 
 3. Link the installed package to here
+
 ```
 $ cd /path/to/tapyrus-api-client-examples/js
 $ npm link tapyrus_api
@@ -25,6 +27,7 @@ let accsessToken = "ya29.a0AfH6SMCCXiqb-VmA6XMquR.....";
 ```
 
 5. Run the scripts
+
 ```
 $ node addresses.js
 ```
