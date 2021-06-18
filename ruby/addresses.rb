@@ -5,21 +5,24 @@ OpenapiClient.configure do |config|
   # config.host = 'localhost:3000'
 end
 
-access_token = "ya29.a0AfH6SMCCXiqb-VmA6XMquR6XWX57hv08BO3RvV_5EsbZR3ojuyMgZ3A2q7VLLUJJj7_e8k0zb0dLVo3DdU2FV8du6sNObLblY16gBMe4IhQNoyT0-8WcZyk1HmjT9Qfs7iRRW0rcpXQzPDdmDqB-nvGw1FuL"
+access_token = ""
 
 api_client = OpenapiClient::ApiClient.new()
 api_client.default_headers = { 'Authorization' => "Bearer #{access_token}" }
 api_instance = OpenapiClient::AddressApi.new(api_client)
 
-get_addresses_opts = {
-    per: 10, # Integer | 1ページあたりの件数
-    page: 1 # Integer | ページ番号
-  }
 begin
-
+  # @route   POST /api/v1/addresses 
+  # @desc    Generate new Address
+  get_addresses_opts = {
+    per: 10,
+    page: 1 
+  }
   add_address_result = api_instance.address()
   p add_address_result
 
+  # @route   GET /api/v1/addresses 
+  # @desc    Get the list of addresses
   get_addresses_result = api_instance.get_addresses(get_addresses_opts)
   p get_addresses_result
 rescue OpenapiClient::ApiError => e
