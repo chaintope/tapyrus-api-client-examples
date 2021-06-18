@@ -17,7 +17,20 @@ Detailed installation instructions can be found in the [OpenAPI Generator Github
 
 To generate the code using Docker, use the [OpenAPI Generator CLI Docker Image](https://hub.docker.com/r/openapitools/openapi-generator-cli/).
 
-You can generate the client code by specifying the following options and executing generate.
+1. clone tapyrus-api repository
+
+```
+$ git clone https://github.com/chaintope/tapyrus-api.git
+```
+
+2. cd into the tapyus-api dir
+
+```
+$ cd tapyrus-api
+```
+
+3. generate the client code by specifying the following options and executing generate.
+
  - `-i`: path to the swagger.yml of tapyrus-api
  - `-g`: The programming language of the client code to generate.
  - `-o`: The directory path to output to.
@@ -25,7 +38,7 @@ You can generate the client code by specifying the following options and executi
 The path of swagger.yml can be a local directory path or a global URL.
 
 ```
-docker run --rm \
+$ docker run --rm \
     -w /work \
     -v ${PWD}:/work openapitools/openapi-generator-cli generate \
     -i /work/public/swagger.yml \
