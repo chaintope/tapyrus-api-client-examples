@@ -12,14 +12,19 @@ $ npm build
 $ npm install .
 ```
 
-
 3. Link the installed package to here
 ```
 $ cd /path/to/tapyrus-api-client-examples/js
 $ npm link tapyrus_api
 ```
 
-4. Run the scripts
+4. Set each file with the access token of the user who will be calling the API.
+
+```
+let accsessToken = "ya29.a0AfH6SMCCXiqb-VmA6XMquR.....";
+```
+
+5. Run the scripts
 ```
 $ node addresses.js
 ```
