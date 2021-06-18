@@ -8,7 +8,12 @@ $ gem build openapi_client.gemspec
 $ gem install ./openapi_client-1.0.0.gem
 ```
 
-3. Run the scripts
+3. Set each file with the access token of the user who will be calling the API.
+```
+access_token = "ya29.a0AfH6SMCCXiqb-VmA6XMquR....."
+```
+
+4. Run the scripts
 ```
 $ ruby addresses.rb
 ```
