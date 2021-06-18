@@ -12,7 +12,12 @@ $ cd /path/to/generated/python/client
 $ python setup.py install --user
 ```
 
-2. Run the scripts
+2. Set each file with the access token of the user who will be calling the API.
+```
+access_token = "ya29.a0AfH6SMCCXiqb-VmA6XMquR....."
+```
+
+3. Run the scripts
 ```
 $ python addresses.py 
 ```
