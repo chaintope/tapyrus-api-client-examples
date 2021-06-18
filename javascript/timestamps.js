@@ -13,7 +13,7 @@ let apiInstance = new TapyrusApi.TimestampApi();
 // @desc    Genetate new timestamp
 let addTimestampOpts = {
   'addTimestampRequest': TapyrusApi.AddTimestampRequest.constructFromObject({
-    content_hash: 'sss', 
+    content_hash: '9ccc644b03a88358a754962903a659a2d338767ee61674dde5434702a6256e6d', 
     prefix: 'app'
   })
 }
