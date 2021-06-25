@@ -1,0 +1,22 @@
+name: openapi-client-swift-sample
+targets:
+  Samples:
+    type: application
+    platform: iOS
+    sources:
+      - path: ./Samples
+        type: directory
+  OpenAPIClient:
+    type: framework
+    platform: iOS
+    deploymentTarget: "9.0"
+    sources: [/Users/oshikawa/out/tapyrus-api-client-swift/OpenAPIClient]
+    info:
+      path: ./Info.plist
+      version: 1.0.0
+    settings:
+      APPLICATION_EXTENSION_API_ONLY: true
+    scheme: {}
+    dependencies:
+    - carthage: Alamofire
+    - carthage: AnyCodable

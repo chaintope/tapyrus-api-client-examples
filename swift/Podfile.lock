@@ -1,0 +1,24 @@
+PODS:
+  - Alamofire (4.9.1)
+  - AnyCodable-FlightSchool (0.6.1)
+  - SwiftyJSON (5.0.1)
+
+DEPENDENCIES:
+  - Alamofire
+  - AnyCodable-FlightSchool (~> 0.6.0)
+  - SwiftyJSON
+
+SPEC REPOS:
+  trunk:
+    - Alamofire
+    - AnyCodable-FlightSchool
+    - SwiftyJSON
+
+SPEC CHECKSUMS:
+  Alamofire: 85e8a02c69d6020a0d734f6054870d7ecb75cf18
+  AnyCodable-FlightSchool: 9d48ed579c898378e189bb0a89faebf9eb8a46a7
+  SwiftyJSON: 2f33a42c6fbc52764d96f13368585094bfd8aa5e
+
+PODFILE CHECKSUM: ae497ab980153ac73f41c89c01c7b8a043c4818a
+
+COCOAPODS: 1.10.1
