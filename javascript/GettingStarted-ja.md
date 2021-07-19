@@ -128,17 +128,17 @@ const issuer = 'https://accounts.google.com';
 
 * [OpenIDコネクト | Google Identity Platform | Google Developers](https://developers.google.com/identity/protocols/oauth2/openid-connect)
 
-### 2.3. oidc_client を作成する
+### 2.3. oidcClient を作成する
 
 `app.listen(...)` はサーバを起動し、指定したポートで接続を待ち受けるようにします。 この第２引数に関数を渡すことでサーバが起動したタイミングに処理をフック出来ます。
 
-ここで oidc_client オブジェクトを作成し、OIDC 認証の準備をします。
+ここで oidcClient オブジェクトを作成し、OIDC 認証の準備をします。
 
 2.2 で追加したコードの下に以下の変数を宣言します。 これらは、サーバのアクションをまたいで保持する必要があるオブジェクトを格納するために使います。
 
 ```javascript
 let googleIssuer;
-let oidc_client;
+let oidcClient;
 let accessToken;
 ```
 
@@ -147,7 +147,7 @@ app.listen(port, async () => {
   console.log(`Example app listening at http://localhost:${port}`)
 
   googleIssuer = await Issuer.discover(issuer);
-  oidc_client = new googleIssuer.Client({
+  oidcClient = new googleIssuer.Client({
     client_id,
     client_secret,
     redirect_uris: [`http://localhost:${port}/cb`],
@@ -177,7 +177,7 @@ OP として Google を利用している場合は、以下のページの説明
 app.get('/authorize', async (req, res) => {
   const code_challenge = generators.codeChallenge(code_verifier);
 
-  let authorizationUrl = oidc_client.authorizationUrl({
+  let authorizationUrl = oidcClient.authorizationUrl({
     scope: 'openid email profile',
     code_challenge,
     code_challenge_method: 'S256',
@@ -212,8 +212,8 @@ app.get('/', async (req, res) => {
 
 ```javascript
 app.get('/cb', async (req, res) => {
-  const params = oidc_client.callbackParams(req);
-  const tokenSet = await oidc_client.callback(`http://localhost:${port}/cb`, params, {code_verifier})
+  const params = oidcClient.callbackParams(req);
+  const tokenSet = await oidcClient.callback(`http://localhost:${port}/cb`, params, {code_verifier})
 
   accessToken = tokenSet.access_token
   res.redirect('/');
@@ -277,8 +277,8 @@ defaultClient.basePath = 'https://testnet-api.tapyrus.chaintope.com/api/v1';
 
 ```javascript
 app.get('/cb', async (req, res) => {
-  const params = oidc_client.callbackParams(req);
-  const tokenSet = await oidc_client.callback(`http://localhost:${port}/cb`, params, {code_verifier})
+  const params = oidcClient.callbackParams(req);
+  const tokenSet = await oidcClient.callback(`http://localhost:${port}/cb`, params, {code_verifier})
 
   const userApi = new TapyrusApi.UserApi();
   userApi.createUser({id_token: tokenSet.id_token, issuer, client_id, access_token: tokenSet.access_token}, (error) => {
