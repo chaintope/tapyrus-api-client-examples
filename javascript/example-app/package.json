@@ -11,6 +11,6 @@
   "dependencies": {
     "express": "^4.17.1",
     "openid-client": "^4.7.4",
-    "tapyrus_api": "file:../../../tapyrus-api/out/tapyrus-api-client-js"
+    "tapyrus_api": "^1.0.3"
   }
 }
