@@ -1,4 +1,3 @@
-npm 
 ## How to build and use a local environment
 
 1. Generate js client code 
