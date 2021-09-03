@@ -110,7 +110,7 @@ app.post('/create_address', (req, res) => {
     if (error) {
       console.error(error);
     } else {
-      console.log(JSON.stringify(data));
+      console.log(data);
       res.redirect('/');
     }
   });
