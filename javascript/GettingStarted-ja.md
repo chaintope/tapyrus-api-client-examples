@@ -387,7 +387,7 @@ userApi.getUserInfo({}, (error, data, response) => {
 ```
 
 ユーザーの残高やアドレスの一覧の取得には `getUserInfo` API を利用します。
-`getuserInfo` API の詳細は [API ドキュメント](https://doc.api.tapyrus.chaintope.com/#operation/getUserInfo) を参照してください。
+`getUserInfo` API の詳細は [API ドキュメント](https://doc.api.tapyrus.chaintope.com/#operation/getUserInfo) を参照してください。
 
 API のコールに成功したら、HTML に書き出します。 サーバーを再起動し、 `/` にブラウザからアクセスすると、以下のように残高とアドレスが確認出来ます。
 
