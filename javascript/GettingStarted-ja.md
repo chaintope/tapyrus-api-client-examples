@@ -108,7 +108,7 @@ const code_verifier = generators.codeVerifier();
 以下のコードを 2.1. で追加したコードの下に追加してください。
 
 ```javascript
-// OpenID Connect client credentials. Modify for your own environment.
+// OpenID Connect のクライアントクレデンシャルを設定します。自身の環境に合わせて修正してください。
 const issuer = 'ここには issuer (OP)の情報を入力します';
 const client_id = 'ここには OP から提供された client_id の情報を入力します';
 const client_secret = 'ここには OP から提供された client_secret の情報を入力します';
