@@ -103,8 +103,6 @@ const {Issuer, generators} = require('openid-client');
 const code_verifier = generators.codeVerifier();
 ```
 
-必要なモジュールを読み込みます。
-
 ### 2.2. OpenID Provider とクレデンシャルの情報をセットする
 
 以下のコードを 2.1. で追加したコードの下に追加してください。
