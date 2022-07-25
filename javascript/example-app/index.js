@@ -6,8 +6,10 @@ app.use(express.urlencoded({extended: true}));
 const port = 3000;
 const tapyrusApiHost = 'https://testnet-api.tapyrus.chaintope.com';
 
-
 const { AuthorizationCode } = require('simple-oauth2');
+const https = require('node:https');
+const http = require('node:http');
+const fs = require('node:fs');
 
 const TapyrusApi = require('tapyrus_api');
 const defaultClient = TapyrusApi.ApiClient.instance;
@@ -17,18 +19,51 @@ defaultClient.basePath = `${tapyrusApiHost}/api/v1`;
 const client_id = '';
 const client_secret = 'dummy';
 
-const config = {
-  client: {
-    id: client_id,
-    secret: client_secret
-  },
-  auth: {
-    tokenHost: tapyrusApiHost,
-    tokenPath: 'oauth2/v1/token',
-    authorizeHost: tapyrusApiHost,
-    authorizePath: 'oauth2/v1/authorize'
-  }
-};
+let config = null;
+// Client certificate
+if (fs.existsSync('user.p12')) {
+  const options = {
+    pfx: fs.readFileSync('user.p12'),
+    passphrase: '1234'
+  };
+  httpsAgent = new https.Agent(options);
+  httpAgent = new http.Agent(options);
+  defaultClient.requestAgent = httpsAgent;
+  config = {
+    client: {
+      id: client_id,
+      secret: client_secret
+    },
+    auth: {
+      tokenHost: tapyrusApiHost,
+      tokenPath: 'oauth2/v1/token',
+      authorizeHost: tapyrusApiHost,
+      authorizePath: 'oauth2/v1/authorize'
+    },
+    http: {
+      agents: {
+        https: httpsAgent,
+        http: httpAgent,
+        httpsAllowUnauthorized: httpsAgent
+      }
+    }
+  };
+} else {
+  config = {
+    client: {
+      id: client_id,
+      secret: client_secret
+    },
+    auth: {
+      tokenHost: tapyrusApiHost,
+      tokenPath: 'oauth2/v1/token',
+      authorizeHost: tapyrusApiHost,
+      authorizePath: 'oauth2/v1/authorize'
+    }
+  };
+}
+
+
 
 let client;
 let accessToken;
