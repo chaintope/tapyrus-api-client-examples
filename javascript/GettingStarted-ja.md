@@ -73,7 +73,7 @@ app.get('/', async (req, res) => {
 
 以下のコマンドでサーバーを起動します。
 
-    $ node index.js
+  $ node index.js
 
 http://localhost:3000 へアクセスし、「Hello, World!」と表示されれば成功です。
 
@@ -101,7 +101,7 @@ const port = 3000
 const { AuthorizationCode } = require('simple-oauth2');
 ```
 
-### 2.2 Tapyrus API Dashboardで認証情報を設定する
+### 2.2. Tapyrus API Dashboardで認証情報を設定する
 
 Tapyrus API Dashboardにログインして認証情報(OpenID プロバイダー/クライアントアプリケーション)を設定します。
 設定方法についてはTapyrus API Dashboardの[ユーザーガイド] > [OpenID Connectによる認証] を参照してください。
@@ -109,7 +109,7 @@ Tapyrus API Dashboardにログインして認証情報(OpenID プロバイダー
 
 - `http://localhost:3000/cb`
 
-### 2.3 クライアント情報を設定する
+### 2.3. クライアント情報を設定する
 
 以下のコードを 2.1. で追加したコードの下に追加してください。
 
@@ -130,11 +130,11 @@ let client;
 let accessToken;
 ```
 
-### 2.4. 認証用アクションを作成する
+### 2.5. 認証用アクションを作成する
 
 これから実際に OpenID Connect を使った認証のための処理を追加していきます。
 
-#### 2.4.1. /authorize アクションの追加
+#### 2.5.1. /authorize アクションの追加
 
 `/authorize` のパスに認証用アクションを作ることにします。以下のコードを `index.js` に追加してください。
 
@@ -167,7 +167,7 @@ app.get('/authorize', async (req, res) => {
 
 ブラウザが `/authorize` へアクセスすると、認可用の URL へリダイレクトをします。 リダイレクト先は OPのウェブサイトであり、ユーザーはそちらで認証を受け、成功すれば先程設定したリダイレクト URL へアクセストークン等と一緒に返ってきます。
 
-#### 2.4.2. トップページに /authorize へのリンクを追加する
+#### 2.5.2. トップページに /authorize へのリンクを追加する
 
 次に、認証用アクションに遷移するためにトップページの表示にリンクを追加します。 トップページの処理を以下のように修正します。
 
@@ -183,7 +183,7 @@ app.get('/', async (req, res) => {
 
 認証に成功しアクセストークンを入手したら `accessToken` にセットすることにします。なので、 `accessToken` が `undefined` のときは認証されていないとみなし、認証アクションへのリンクを表示します。
 
-#### 2.4.3. コールバックアクション `/cb` を追加する
+#### 2.5.3. コールバックアクション `/cb` を追加する
 
 最後に、リダイレクト URL でアクセスされるコールバックアクションを `/cb` というパスで作成します。 以下のコードを `index.js` へ追加してください。
 
@@ -214,18 +214,108 @@ Tapyrus API ユーザーは Tapyrus API にアクセスする際に必要なユ�
 Tapyrus API ユーザーはウォレットを１つもっており、ユーザーごとに独立して Tapyrus のネイティブコインである TPC やトークンなどの資産の管理が可能です。
 言い換えると、あなたのアプリケーションで独立して資産を管理したい単位で Tapyrus API ユーザーを作成することが出来ます。
 
+## 3. クライアント証明書の利用
 
-#### 2.4.4. 認証を試す
+### 3.1. クライアント証明書の発行
 
-ここで、OpenID Connect を使った認証がうまく動作するかを試します。サーバーが起動している場合は一旦停止し、再び起動しましょう。
+Tapyrus APIに接続する際にはクライアント証明書を使用します。
 
-    $ node index.js
+Tapyrus API Dashboardの[クライアント証明書]メニューからTapyrus APIに接続する際に利用するクライアント証明書を発行することができます。
+Tapyrus API Dashboardからダウンロードしたクライアント証明書(p12形式)は`index.js`と同じディレクトリに配置します。
 
-http://localhost:3000 へアクセスします。
+### 3.2. tapyrus_api NPM パッケージの追加
+
+Tapyrus API へアクセスするために、そのクライアントである NPM パッケージをプロジェクトに追加します。
+
+    $ npm install tapyrus_api --save
+
+次に、`index.js` のモジュールの読み込みが書いてある箇所に以下を追加します
+
+```javascript
+const tapyrusApiHost = 'Tapyrus API Dashboardから実際のエンドポイントのURLを入手して置き換えてください';
+const TapyrusApi = require('tapyrus_api');
+const defaultClient = TapyrusApi.ApiClient.instance;
+defaultClient.basePath = `${tapyrusApiHost}/api/v1`;
+```
+
+`basePath` に設定するのは利用する Tapyrus API のエンドポイントです。 Tapyrus API Dashboardのホーム画面に表示されているAPIエンドポイントのURLを設定してください。
+
+### 3.3. クライアント証明書の設定を追加する
+
+変数 `config` を宣言している部分を以下のように変更します。証明書のダウンロード時にパスワードを設定しなかった場合は、`passphrase = '';` としてください。
+
+```javascript
+const https = require('node:https');
+const http = require('node:http');
+const fs = require('node:fs');
+
+let config = null;
+
+const cert = 'クライアント証明書ファイル名(p12)';
+const passphrase = 'クライアント証明書のパスワード';
+
+// Client certificate
+if (fs.existsSync(cert)) {
+  const options = {
+    pfx: fs.readFileSync(cert),
+    passphrase: passphrase
+  };
+  httpsAgent = new https.Agent(options);
+  httpAgent = new http.Agent(options);
+  defaultClient.requestAgent = httpsAgent;
+  config = {
+    client: {
+      id: client_id,
+      secret: client_secret
+    },
+    auth: {
+      tokenHost: tapyrusApiHost,
+      tokenPath: 'oauth2/v1/token',
+      authorizeHost: tapyrusApiHost,
+      authorizePath: 'oauth2/v1/authorize'
+    },
+    http: {
+      agents: {
+        https: httpsAgent,
+        http: httpAgent,
+        httpsAllowUnauthorized: httpsAgent
+      }
+    }
+  };
+} else {
+  config = {
+    client: {
+      id: client_id,
+      secret: client_secret
+    },
+    auth: {
+      tokenHost: tapyrusApiHost,
+      tokenPath: 'oauth2/v1/token',
+      authorizeHost: tapyrusApiHost,
+      authorizePath: 'oauth2/v1/authorize'
+    }
+  };
+}
+```
+
+### 3.3. クライアント証明書を使用したアクセスの確認
+
+OpenID Connect を使った認証がうまく動作するかを試します。
+
+発行したクライアント証明書をクライアント環境にインストールします。インストールの方法はお使いのクライアント環境に依存します。
+インストール後、サーバーを再起動し、ブラウザからアクセスします。
+
+  $ node index.js
+
+http://localhost:3000 へアクセスします。Node.js v17.0.0 以降では `--openssl-legacy-provider` オプションが必要な場合があります。
+
+  $ node  --openssl-legacy-provider index.js
 
 ![image01](./images/01.png)
 
-「authorize」をクリックすると OP の画面へ遷移するので、そこで認証を行います。 認証に成功すると、以下の Hello, World! 画面が表示されれば成功です。
+「authorize」をクリックするとブラウザから使用するクライアント証明書が求められますので、インストールしたクライアント証明書を選択して、処理を続行します。
+
+OP の画面へ遷移するので、そこで認証を行います。 認証に成功すると、以下の Hello, World! 画面が表示されれば成功です。
 
 ![image02](./images/02.png)
 
@@ -236,24 +326,7 @@ http://localhost:3000 へアクセスします。
 ここまでで Tapyrus API を実際に呼び出す準備が整いました。 早速送金などのトランザクションを発行する API を実行してみたいのですが、そのためには TPC を入手する必要があります。 作成したばかりのユーザーのウォレットには
 TPC が入っていませんので、送金をすることが出来ません。 そこで、アドレスを生成し、testnet のfaucetから資金を入手します。
 
-### 4.1. tapyrus_api NPM パッケージの追加
-
-Tapyrus API へアクセスするために、そのクライアントである NPM パッケージをプロジェクトに追加します。
-
-    $ npm install tapyrus_api --save
-
-次に、`index.js` のモジュールの読み込みが書いてある箇所に以下を追加します
-
-```javascript
-const TapyrusApi = require('tapyrus_api');
-const defaultClient = TapyrusApi.ApiClient.instance;
-defaultClient.basePath = 'https://testnet-api.tapyrus.chaintope.com/api/v1';
-```
-
-`basePath` に設定するのは利用する Tapyrus API のエンドポイントです。 ここでは testnet を利用する想定ですが、別のチェーンを使う場合は、それに合わせた Tapyrus API
-のエンドポイントを設定してください。
-
-### 4.2. アドレス作成アクションを追加する
+### 4.1. アドレス作成アクションを追加する
 
 以下のコードを `index.js` に追加してください。
 
@@ -273,7 +346,7 @@ app.post('/create_address', (req, res) => {
 
 `createAddress` API を利用してアドレスを生成します。 このアクションの実行に成功すると、サーバーを起動しているコンソールにアドレスが出力されます。
 
-### 4.3. アドレス作成アクションを実行するボタンを追加する
+### 4.2. アドレス作成アクションを実行するボタンを追加する
 
 `/` のアクションの
 
@@ -473,81 +546,6 @@ tx はまだブロックに登録されていないので、Verified Time には
 
 下段には入出力のスクリプトが表示されています。ここでは P2PKH スクリプトが使われています。
 
-## 8. クライアント証明書の利用
-
-### 8.1 クライアント証明書の発行
-
-Tapyrus APIに接続する際にクライアント証明書を使用することができます。
-
-Tapyrus API Dashboardの[クライアント証明書]メニューからTapyrus APIに接続する際に利用するクライアント証明書を発行することができます。
-Tapyrus API Dashboardからダウンロードしたクライアント証明書(p12形式)は`index.js`と同じディレクトリに配置します。
-
-### 8.2 クライアント証明書の設定を追加する
-
-変数 `config` を宣言している部分を以下のように変更します。
-
-```javascript
-const https = require('node:https');
-const http = require('node:http');
-const fs = require('node:fs');
-
-let config = null;
-const tapyrusApiHost = 'https://testnet-api.tapyrus.chaintope.com';
-
-const cert = 'クライアント証明書ファイル名(p12)'
-const passphrase = 'クライアント証明書のパスワード'
-
-// Client certificate
-if (fs.existsSync(cert)) {
-  const options = {
-    pfx: fs.readFileSync(cert),
-    passphrase: passphrase
-  };
-  httpsAgent = new https.Agent(options);
-  httpAgent = new http.Agent(options);
-  defaultClient.requestAgent = httpsAgent;
-  config = {
-    client: {
-      id: client_id,
-      secret: client_secret
-    },
-    auth: {
-      tokenHost: tapyrusApiHost,
-      tokenPath: 'oauth2/v1/token',
-      authorizeHost: tapyrusApiHost,
-      authorizePath: 'oauth2/v1/authorize'
-    },
-    http: {
-      agents: {
-        https: httpsAgent,
-        http: httpAgent,
-        httpsAllowUnauthorized: httpsAgent
-      }
-    }
-  };
-} else {
-  config = {
-    client: {
-      id: client_id,
-      secret: client_secret
-    },
-    auth: {
-      tokenHost: tapyrusApiHost,
-      tokenPath: 'oauth2/v1/token',
-      authorizeHost: tapyrusApiHost,
-      authorizePath: 'oauth2/v1/authorize'
-    }
-  };
-}
-```
-
-### 8.3 クライアント証明書を使用したアクセスの確認
-
-発行したクライアント証明書をクライアント環境にインストールします。インストールの方法はお使いのクライアント環境に依存します。
-インストール後、サーバーを再起動し、ブラウザからアクセスします。
-
-ブラウザから使用するクライアント証明書が求められますので、インストールしたクライアント証明書を選択して、処理を続行します。
-
 ## おわり
 
 お疲れ様でした。これで Getting Started は終了になります。 今回利用しなかった API を実行するサンプルコードも以下にありますので、合わせてご確認いただければ使い方について理解が進むと思います。
@@ -557,7 +555,3 @@ if (fs.existsSync(cert)) {
 * [token](tokens.js)
 * [address](./addresses.js)
 * [user](./users.js)
-
-
-
-
