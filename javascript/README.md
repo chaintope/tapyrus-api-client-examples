@@ -30,3 +30,9 @@ let accsessToken = "ya29.a0AfH6SMCCXiqb-VmA6XMquR.....";
 ```
 $ node addresses.js
 ```
+
+If you use self-signed client certificate, set flag `NODE_TLS_REJECT_UNAUTHORIZED` to 0
+
+```
+NODE_TLS_REJECT_UNAUTHORIZED='0' node index.js
+```

@@ -1,36 +1,75 @@
 const express = require('express');
+const crypto = require('crypto');
 const app = express();
 app.use(express.urlencoded({extended: true}));
-const port = 3000;
 
-const {Issuer, generators} = require('openid-client');
-const code_verifier = generators.codeVerifier();
+const port = 3000;
+const tapyrusApiHost = 'https://testnet-api.tapyrus.chaintope.com';
+
+const { AuthorizationCode } = require('simple-oauth2');
+const https = require('node:https');
+const http = require('node:http');
+const fs = require('node:fs');
 
 const TapyrusApi = require('tapyrus_api');
 const defaultClient = TapyrusApi.ApiClient.instance;
-defaultClient.basePath = 'https://testnet-api.tapyrus.chaintope.com/api/v1';
+defaultClient.basePath = `${tapyrusApiHost}/api/v1`;
 
-// OpenID Connect client credentials. Modify for your own environment.
-const issuer = '';
+// OAuth2 Client credentials. Modify for your own environment.
 const client_id = '';
-const client_secret = '';
+const client_secret = 'dummy';
 
-let googleIssuer;
-let oidcClient;
+let config = null;
+// Client certificate
+if (fs.existsSync('user.p12')) {
+  const options = {
+    pfx: fs.readFileSync('user.p12'),
+    passphrase: '1234'
+  };
+  httpsAgent = new https.Agent(options);
+  httpAgent = new http.Agent(options);
+  defaultClient.requestAgent = httpsAgent;
+  config = {
+    client: {
+      id: client_id,
+      secret: client_secret
+    },
+    auth: {
+      tokenHost: tapyrusApiHost,
+      tokenPath: 'oauth2/v1/token',
+      authorizeHost: tapyrusApiHost,
+      authorizePath: 'oauth2/v1/authorize'
+    },
+    http: {
+      agents: {
+        https: httpsAgent,
+        http: httpAgent,
+        httpsAllowUnauthorized: httpsAgent
+      }
+    }
+  };
+} else {
+  config = {
+    client: {
+      id: client_id,
+      secret: client_secret
+    },
+    auth: {
+      tokenHost: tapyrusApiHost,
+      tokenPath: 'oauth2/v1/token',
+      authorizeHost: tapyrusApiHost,
+      authorizePath: 'oauth2/v1/authorize'
+    }
+  };
+}
+
+
+
+let client;
 let accessToken;
 
 app.listen(port, async () => {
   console.log(`Example app listening at http://localhost:${port}`)
-
-  googleIssuer = await Issuer.discover(issuer);
-  oidcClient = new googleIssuer.Client({
-    client_id,
-    client_secret,
-    redirect_uris: [`http://localhost:${port}/cb`],
-    response_types: ['code'],
-  });
-
-  console.log('oidc client ready');
 })
 
 app.get('/', async (req, res) => {
@@ -76,32 +115,21 @@ app.get('/', async (req, res) => {
 });
 
 app.get('/authorize', async (req, res) => {
-  const code_challenge = generators.codeChallenge(code_verifier);
-
-  let authorizationUrl = oidcClient.authorizationUrl({
-    scope: 'openid email profile',
-    code_challenge,
-    code_challenge_method: 'S256',
+  client = new AuthorizationCode(config);
+  const state = crypto.randomBytes(16).toString('base64').substring(0, 16);
+  const authorizationUri = client.authorizeURL({
+    redirect_uri: `http://localhost:${port}/cb`,
+    scope: 'openid profile',
+    state
   });
-
-  res.redirect(authorizationUrl);
+  res.redirect(authorizationUri);
 });
 
 app.get('/cb', async (req, res) => {
-  const params = oidcClient.callbackParams(req);
-  const tokenSet = await oidcClient.callback(`http://localhost:${port}/cb`, params, {code_verifier})
-
-  const userApi = new TapyrusApi.UserApi();
-  userApi.createUser({id_token: tokenSet.id_token, issuer, client_id, access_token: tokenSet.access_token}, (error) => {
-    if (error) {
-      console.error(error);
-    } else {
-      accessToken = tokenSet.access_token;
-      TapyrusApi.ApiClient.instance.defaultHeaders = {Authorization: `Bearer ${accessToken}`}
-    }
-
-    res.redirect('/');
-  });
+  response = await client.getToken({ code: req.query.code });
+  accessToken = response.token['access_token'];
+  defaultClient.defaultHeaders = {Authorization: `Bearer ${accessToken}`};
+  res.redirect('/');
 });
 
 app.post('/create_address', (req, res) => {
